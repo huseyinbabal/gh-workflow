@@ -1,0 +1,21 @@
+name: URL Checker
+on:
+  pull_request:
+  push:
+    tags:
+      - "*"
+jobs:
+  url-checker:
+    name: URL Checker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.21
+      - name: Run Mage
+        uses: magefile/mage-action@v3
+        with:
+          args: deployment:wait
