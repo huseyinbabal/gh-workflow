@@ -10,29 +10,30 @@ import (
 )
 
 type Status struct {
-	Version string `json:"version"`
-	Ready   bool   `json:"ready"`
+	Version string
+	Ready   bool
 }
 
-func WaitFor(version string) error {
+func WaitFor(url, version string) error {
 	deadline := time.Now().Add(100 * time.Second)
 	for time.Now().Before(deadline) {
 		time.Sleep(2 * time.Second)
-		status, err := getDeploymentStatus()
+		status, err := getDeploymentStatus(url)
 		if err != nil {
 			fmt.Println("failed to get status.", err)
 			continue
 		}
-		if status.Version == version {
+		if status.Version == version && status.Ready {
+			fmt.Println("deployment is ready.")
 			return nil
 		}
-		fmt.Println("version mismatch. actual:", status.Version, ", expected: ", version)
+		fmt.Println("deployment is not ready, actual version:", status.Version, ", expected version: ", version, ", ready: ", status.Ready)
 	}
 	return errors.New("deployment verification timeout")
 }
 
-func getDeploymentStatus() (*Status, error) {
-	resp, err := http.Get("https://webhook.site/8fc86320-5be4-46e7-a454-e45f45f297b1")
+func getDeploymentStatus(url string) (*Status, error) {
+	resp, err := http.Get(url)
 	if err != nil {
 		return nil, fmt.Errorf("while getting deployment status %w", err)
 	}

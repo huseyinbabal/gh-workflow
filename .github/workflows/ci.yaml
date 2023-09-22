@@ -19,3 +19,6 @@ jobs:
         uses: magefile/mage-action@v3
         with:
           args: deployment:wait
+        env:
+          DEPLOYMENT_STATUS_URL: "https://webhook.site/8fc86320-5be4-46e7-a454-e45f45f297b1"
+          EXPECTED_VERSION: "v1.2.5"

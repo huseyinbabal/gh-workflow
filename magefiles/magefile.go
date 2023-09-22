@@ -2,6 +2,7 @@ package main
 
 import (
 	"botkub-cloud-backend/tools/deployment"
+	"errors"
 	"github.com/99designs/gqlgen/api"
 	"github.com/99designs/gqlgen/codegen/config"
 	"github.com/carolynvs/magex/mgx"
@@ -54,5 +55,15 @@ func (Gen) Gql() {
 type Deployment mg.Namespace
 
 func (Deployment) Wait() {
-	mgx.Must(deployment.WaitFor("v1.2.5"))
+	var err error
+	url := os.Getenv("DEPLOYMENT_STATUS_URL")
+	if url == "" {
+		err = errors.New("DEPLOYMENT_STATUS_URL env variable is not set")
+	}
+	version := os.Getenv("EXPECTED_VERSION")
+	if version == "" {
+		err = errors.New("EXPECTED_VERSION env variable is not set")
+	}
+	mgx.Must(err)
+	mgx.Must(deployment.WaitFor(url, version))
 }
